@@ -1,0 +1,109 @@
+USE MyAmazonCompetitor;
+Create Role NewRole
+Grant Update on Products to NewRole
+Grant Update, Insert on ZIPDetails to NewRole
+Grant Update, Insert, Delete on Warehouse to NewRole
+Exec sp_addrolemember db_datareader , NewRole
+
+
+CREATE LOGIN AmazonCompetitorDatabase01 with password = 'zzz123',
+Default_Database = MyAmazonCompetitor
+Create USER ParikshitDubey for login AmazonCompetitorDatabase01
+Exec sp_addrolemember NewRole, ParikshitDubey;
+
+
+GO 
+Create Schema ParikshitDubs
+Go 
+Alter Schema ParikshitDubs Transfer dbo.Products
+Alter User ParikshitDubey with Default_Schema= ParikshitDubs 
+Grant Delete,Select,Update, Insert, Execute on Schema :: ParikshitDubs to ParikshitDubey
+
+
+USE MyAmazonCompetitor;
+GO
+CREATE PROC procdateSelect
+@DateMin varchar(30) = NULL,
+@DateMax varchar(30) = NULL
+AS
+IF @DateMin IS NULL OR @DateMax IS NULL
+THROW 50001, 'Please enter the minimum and maximum date', 1;
+
+IF NOT(ISDATE(@DateMin) = 1 AND ISDATE(@DateMin) = 1)
+THROW 50001, 'Please enter a valid date format', 1;
+
+IF CAST(@DateMin AS datetime) >  CAST(@DateMax AS datetime) 
+THROW 50001, 'DateMin cannot be greater than DateMax', 1;
+
+SELECT ReviewID, DateOfReview, Score
+FROM Review
+WHERE DateOfReview BETWEEN @DateMin AND @DateMax
+ORDER BY DateOfReview;
+
+
+
+
+
+BEGIN TRY
+EXEC procdateSelect '12/12/2019';
+
+END TRY
+
+BEGIN CATCH
+PRINT 'Error Number - ' +  CONVERT(varchar(30), ERROR_NUMBER());
+PRINT 'Error Message - ' +  CONVERT(varchar(50), ERROR_MESSAGE());
+END CATCH
+
+USE MyAmazonCompetitor
+EXECUTE('CREATE VIEW ProductView AS
+SELECT ProductID, ProductName, Description, Price
+FROM Products;')
+
+SELECT * FROM ProductView;
+
+
+USE MyAmazonCompetitor
+EXECUTE('CREATE VIEW ReviewView AS
+SELECT ProductID, Score, CustomerName
+FROM Review;')
+
+SELECT * FROM ReviewView;
+
+USE MyAmazonCompetitor
+EXECUTE('CREATE VIEW RatingView AS
+SELECT ProductName, Score, CustomerName
+
+FROM Review JOIN Products
+ON Review.ProductID = Products.ProductID;')
+
+SELECT * FROM RatingView;
+
+
+
+EXECUTE('CREATE VIEW ExpensiveItems AS
+SELECT ProductName, Description, Price
+FROM Products
+WHERE Price > 500;')
+
+SELECT * FROM ExpensiveItems;
+
+
+CREATE VIEW OrdersInProcessing AS
+SELECT OrderID,OrderDate,Status,TotalPrice,ShippingInfo,ExpectedShippingDate
+FROM OrdersTable
+WHERE Status = 'Processing';
+
+SELECT * FROM OrdersInProcessing;
+CREATE TRIGGER TRIGGER1
+ON Products
+AFTER INSERT,UPDATE,DELETE
+AS RAISERROR('Product table has some updates, Please review',16,10)
+GO
+
+SET IDENTITY_INSERT Products ON;
+
+INSERT INTO Products(ProductID, ProductName, Description, Price) VALUES
+('1011','Phone Case','Christmas style: It will be a home decor at Christmas, which makes the festival interesting','200')
+SET IDENTITY_INSERT Products OFF;
+
+SELECT * FROM Products;
