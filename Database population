@@ -1,0 +1,396 @@
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT Products ON;
+
+INSERT INTO Products(ProductID, ProductName, Description, Price) VALUES
+('10001','Christmas Pillow Case','Christmas style: It will be a home decor at Christmas, which makes the festival interesting','3'),
+('10002','Nestl Reading Pillow',' Two convenient pockets help you create a cozy nest so that you don’t have to get up once you’ve finally gotten really comfortable!','20'),
+('10003','Aladdin (Live Action) (Blu-ray + DVD + Digital Copy)', 'New copy', '30'),
+('10011','Coalgate','Makes your breath fresh','4'),
+('10004','Dove Shampoo', 'Makes your hair smooth', '7'),
+('10005','PS4','Lets game', '199'),
+('10006','Listerine', 'Makes your breath fresh', '12'),
+('10007','Beanie','Best companion for winters','12'),
+('10008','HP Pavillion Laptop', 'Unbeateable performance, i9 processor', '1799'),
+('10009','Apple iPad Pro', '11 inch 2019 version', '799'),
+('10010','Vaseline','Intensive care', '15');
+SET IDENTITY_INSERT Products OFF;
+
+SELECT * FROM Products;
+
+
+
+/*
+CREATE TABLE Review(
+ReviewID			 INT					 PRIMARY KEY			IDENTITY NOT NULL,
+ProductID			 INT						REFERENCES Products(ProductID),
+DateOfReview		 DATETIME		NOT NULL,
+Comments			 VARCHAR(255)			DEFAULT NULL,
+Score				 INT					DEFAULT NULL,
+CustomerName		 VARCHAR(255)			DEFAULT NULL,
+);
+*/
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT Review ON;
+
+INSERT INTO Review(ReviewID,ProductID,DateOfReview,Comments,Score,CustomerName) VALUES
+(1,10010,'02-10-2019','Good Product!',10,'Aaron'),
+(2,10009,'04-03-2019','Mediocre Product', 5, 'Lisa'),
+(3,10003,'12-04-2019','Bad', 1,'Ruben'),
+(4,10007,'07-03-2019','',9,'XYZ'),
+(5,10001,'05-10-2018','Good Product!',5,'Andy'),
+(6,10004,'08-07-2017','Worth Buy', 8, 'Lima'),
+(7,10008,'12-10-2019','Bad', 3,'Ruby'),
+(8,10005,'07-07-2019','Nice',7,'Karen'),
+(9,10002,'12-01-2019','Bad', 3,'Ruby'),
+(10,10006,'07-12-2018','',10,'Kathy')
+
+SET IDENTITY_INSERT Review OFF;
+
+SELECT * FROM Review;
+
+/****Object: Wishlist Table ***
+CREATE TABLE WishList(
+WishListID				INT							PRIMARY KEY			IDENTITY	NOT NULL,
+Date					DATETIME					DEFAULT NULL,
+ProductID				INT					   REFERENCES PRODUCTS(ProductID),
+Quantity				INT				NOT NULL
+);*/
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT Wishlist ON;
+
+INSERT INTO WishList(WishListID,Date,ProductID,Quantity) VALUES
+(1,'02-10-2019',10010,3),
+(2,'04-03-2019',10009,1),
+(3,'12-04-2019',10003,5),
+(4,'07-03-2019',10007,9),
+(5,'05-10-2018',10001,5),
+(6,'08-07-2017',10004,8),
+(7,'12-10-2019',10008,3),
+(8,'07-07-2019',10005,7),
+(9,'12-01-2019',10002,12),
+(10,'07-12-2018',10006,10)
+SET IDENTITY_INSERT Wishlist OFF;
+
+SELECT * FROM WishList;
+
+
+/****Object: Customers Table ***
+CREATE TABLE Customers(
+CustomerID				INT							PRIMARY KEY			IDENTITY NOT NULL,
+CustomerName			VARCHAR(60)		NOT NULL,
+username				VARCHAR(60)		NOT NULL	UNIQUE,
+CustomerEmail			VARCHAR(255)	NOT NULL	UNIQUE,
+CustomerPhone			VARCHAR(20)				NOT NULL,
+ZIP						INT							REFERENCES ZIPDetails(ZIP),
+ReturnID				INT				NOT NULL,									/*ADD REFERENCE*/
+WishListID				INT						    REFERENCES WishList(WishListID),
+ReviewID				INT							REFERENCES Review(ReviewID)
+);
+*/
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT Customers ON;
+
+INSERT INTO Customers(CustomerID,CustomerName,username,CustomerEmail,CustomerPhone,ZIP,ReturnID,WishListID,ReviewID) VALUES
+(1,'Allan Sherwood','allan','allan.sherwood@yahoo.com','1922947934',25701,1,2,1),
+(2,'Barry Sherwood','barry','barry.sherwood@yahoo.com','19473947934',40206,4,1,8),
+(3,'Chris Wood','cwood','c.wood@yahoo.com','19892447934',99611,2,3,7),
+(4,'Jason Butt','Jbutt','Jbutt@yahoo.com','19439247934',83638,9,4,6),
+(5,'Leo','Leo','Leo@yahoo.com','3362368239',59759,5,5,4),
+(6,'Kris','Kris','kris@gmail.com','982378219',04401,6,6,2),
+(7,'Minna','Minna','minna@yahoo.com','321232232',58401,3,7,3),
+(8,'Sage','Sages','sage@yahoo.com','84783238294',83638,7,8,5),
+(9,'Amac Kerry', 'Akerry', 'ak@yahoo.com','726237298',97321,8,9,9),
+(10,'Donette Louis', 'Dnloius', 'adnl@yahoo.com', '32162563221', 97702,9,10,10)
+SET IDENTITY_INSERT Customers OFF;
+
+SELECT * FROM Customers;
+
+/********Object: OrderItems table*********
+CREATE TABLE OrderItems(
+OrderItemsID		   INT							PRIMARY KEY			IDENTITY NOT NULL,
+ProductID			   INT							REFERENCES Products(ProductID),
+Quantity			   INT			 NOT NULL,
+UnitPrice			   MONEY		 NOT NULL,
+CumlativeCost	       MONEY		 NOT NULL
+);*/
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT OrderItems ON;
+INSERT INTO OrderItems(OrderItemsID,ProductID,Quantity,UnitPrice,CumlativeCost) VALUES
+(1,10010,3,4,12),
+(2,10002,4,12,48),
+(3,10001,8,2,16),
+(10,10004,10,3,30),
+(4,10003,32,2,64),
+(5,10006,21,3,63),
+(6,10005,54,2,108),
+(7,10008,15,3,45),
+(8,10007,1200,2,2400),
+(9,10009,2100,1,2100)
+SET IDENTITY_INSERT OrderItems OFF;
+
+SELECT * from OrderItems;
+
+/*
+CREATE TABLE ReturnItems(
+ReturnItemsID		  INT							PRIMARY KEY		  IDENTITY NOT NULL,
+ProductID			  INT							REFERENCES Products(ProductID),
+Quantity			  INT					DEFAULT NULL
+);*/
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT ReturnItems ON;
+INSERT INTO ReturnItems(ReturnItemsID,ProductID,Quantity) VALUES
+(1,10001,3),
+(2,10002,4),
+(3,10003,2),
+(4,10004,5),
+(5,10005,10),
+(6,10006,21),
+(7,10007,14),
+(8,10008,56),
+(9,10009,25),
+(10,10010,54)
+SET IDENTITY_INSERT ReturnItems OFF;
+
+SELECT * FROM ReturnItems;
+
+/*/*******Object: Return details***********/
+CREATE TABLE ReturnDetails(
+ReturnID			   INT							PRIMARY KEY			IDENTITY NOT NULL,
+ReturnItemsID		   INT							REFERENCES ReturnItems(ReturnItemsID),
+DateOfReturn		   DATETIME				DEFAULT NULL,
+StatusOfReturn		   VARCHAR(255)			DEFAULT NULL,
+ShippingInfo		   VARCHAR(255)			DEFAULT NULL,
+ShippingCost		   Money				DEFAULT NULL
+);*/
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT ReturnDetails ON;
+INSERT INTO ReturnDetails(ReturnID,ReturnItemsID,DateOfReturn,StatusOfReturn,ShippingInfo,ShippingCost) VALUES
+(1,1,'01-04-2019','Returned','FedEx',3),
+(2,2,'01-05-2019','Returned','FedEx',4),
+(3,3,'12-04-2018','Not Returned','',0),
+(4,4,'04-04-2019','Returned','FedEx',2),
+(5,5,'05-12-2019','Returned','FedEx',12),
+(6,6,'11-01-2019','Not Returned','',0),
+(7,7,'11-05-2019','Not Returned','',0),
+(8,8,'07-14-2018','Returned','USPS',4),
+(9,9,'04-06-2019','Returned','FedEx',1),
+(10,10,'10-12-2019','Returned','UPS',0)
+SET IDENTITY_INSERT ReturnDetails OFF;
+
+SELECT * FROM ReturnDetails;
+
+/*
+/****Object: OrdersTable ****/
+CREATE TABLE OrdersTable(
+OrderID				    INT							 PRIMARY KEY       IDENTITY    NOT NULL,
+CustomerId				INT							 REFERENCES Customers(CustomerID),								
+Status					VARCHAR(255)    NOT NULL,
+ReturnID				INT							 REFERENCES ReturnDetails(ReturnID),
+OrderDate				DATETIME		NOT NULL,
+OrderItemsID			INT							 REFERENCES OrderItems(OrderItemsID),
+TotalPrice				MONEY			NOT NULL,
+ShippingService			VARCHAR(255)					DEFAULT NULL,
+StreetAddress			VARCHAR(255)	NOT NULL,
+ZIP						INT								REFERENCES ZIPDetails(ZIP),								
+ShippingFare			MONEY			NOT NULL,
+ExpectedShippingDate	DATETIME		NOT NULL,
+ActualShippingDate		DATETIME						DEFAULT NULL,
+ShippingInfo			VARCHAR(255)					DEFAULT NULL
+);*/
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT OrdersTable ON;
+INSERT INTO OrdersTable(OrderID,CustomerID,Status,ReturnID,OrderDate,OrderItemsID,TotalPrice,ShippingService,StreetAddress,ZIP,ShippingFare,ExpectedShippingDate,ActualShippingDate,ShippingInfo) VALUES
+(1,1,'Processing',1,'06-07-2019',1,14,'UPS','111 ABC Street',25701,3,'06-08-2019','',''),
+(2,2,'Processing',2,'06-09-2019',2,16,'USPS','222 ABC Street',25701,4,'06-09-2019','',''),
+(3,3,'Processing',3,'07-07-2019',3,14,'FedEx','333 PYS Street',40206,4,'07-08-2019','',''),
+(4,4,'Processing',4,'07-09-2019',4,213,'USPS','276 RTT Street',97702,2,'07-09-2019','',''),
+(5,5,'Processing',5,'06-07-2019',6,148,'UPS','111 RON Street',25701,3,'06-08-2019','',''),
+(6,6,'Processing',6,'06-09-2019',5,1676,'USPS','222 West Street',04401,4,'06-09-2019','',''),
+(7,7,'Processing',7,'07-07-2019',8,1400,'FedEx','333 North Street',40206,4,'07-08-2019','',''),
+(8,8,'Processing',8,'07-09-2019',7,2130,'USPS','276 Euclid Street',58401,2,'07-09-2019','',''),
+(9,9,'Processing',9,'07-09-2019',10,243,'USPS','276 RTT Street',97702,2,'07-09-2019','07-09-2019','Reached'),
+(10,10,'Processing',10,'06-07-2019',9,187,'UPS','111 RON Street',25701,5,'06-08-2019','06-09-2019','Reached')
+SET IDENTITY_INSERT OrdersTable OFF;
+
+SELECT * FROM OrdersTable;
+
+
+/*('25701','Huntington','WV'),
+('40206','Louisville','KY'),
+('99611','Kenai','AK'),
+('97702','Bend','OR'),
+('97321','Albany','OR'),
+('83638','McCall','ID'),
+('59759','Whitehall','MT'),
+('59801','Missoula','MT'),
+('58401','Jamestown','ND'),
+('04401','Bangor','ME')*/
+/*
+ProductsStoredID	   INT						 PRIMARY KEY		  IDENTITY	NOT NULL,	
+ProductID	           INT						 REFERENCES Products(ProductID),
+NumberInStock		   INT				NOT NULL,
+NumberOnWay			   INT					DEFAULT NULL,
+NumberOnReturn		   INT					DEFAULT NULL,
+
+*/
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT ProductsStored ON;
+
+INSERT INTO ProductsStored(ProductsStoredID,ProductID,NumberInStock,NumberOnWay,NumberOnReturn) VALUES
+(1,10003,4,1,0),
+(2,10002,12,3,2),
+(3,10001,34,11,1),
+(4,10006,123,32,2),
+(5,10004,1211,154,44),
+(6,10007,9,8,0),
+(7,10005,36,2,0),
+(8,10008,78,0,12),
+(9,10011,3892,230,0),
+(10,10010,3213,789,342)
+SET IDENTITY_INSERT ProductsStored OFF;
+
+SELECT * FROM ProductsStored;
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT Suppliers ON;
+
+INSERT INTO Suppliers(SupplierID,SupplierName,StreetName,ZIP,SupplierPhone,SupplierEmailID,NumberOfProducts) VALUES
+(1,'ABC','123 Rhongthen Street','25701',8459734383,'abc@xyz.com',3),
+(2,'ABZ','136 Westcott Street','40206',8459434333,'abz@xyz.com',2),
+(3,'Yu Xe','765 Stratham Street','99611',83329232324, 'yu@xyz.com',10),
+(4,'PVK corp', '677 Westend ave','97702',142536223232,'pvk@xyz.com',12),
+(5,'Zen corp', '664 Northend ave','97321',236623232322, 'zen@xyz.com',7),
+(6,'Ram Goods', '7675 Mountain ave', '83638', 3486565656, 'ram@xyz.com',20),
+(7,'food Goods', '734 Park ave', '59759', 128962324, 'food@good.com',2),
+(8,'UUI Goods', '1 Teal ave', '59801', 11035142536, 'uui@uui.com',12),
+(9,'Zec corp', '664 Souththend ave','97702',67638742536, 'zec@uis.com',3),
+(10,'Ramirez Corp', '7675 Riverside ave', '99611', 3483766221, 'ramirez@wqq.com',9)
+SET IDENTITY_INSERT Suppliers OFF;
+
+SELECT * FROM Suppliers;
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT ZIPDetails ON;
+
+INSERT INTO ZIPDetails(ZIP, City, State) VALUES
+('25701','Huntington','WV'),
+('40206','Louisville','KY'),
+('99611','Kenai','AK'),
+('97702','Bend','OR'),
+('97321','Albany','OR'),
+('83638','McCall','ID'),
+('59759','Whitehall','MT'),
+('59801','Missoula','MT'),
+('58401','Jamestown','ND'),
+('04401','Bangor','ME')
+SET IDENTITY_INSERT ZIPDetails OFF;
+/*CREATE TABLE WarehouseToProductsStored(
+WarehouseID			  INT						REFERENCES Warehouse(WarehouseID),
+ProductsStoredID	  INT						REFERENCES ProductsStored(ProductsStoredID)
+)
+
+CREATE TABLE ProductsToSupplierLink(
+ProductID			  INT						 REFERENCES Products(ProductID),
+SupplierID			  INT						 REFERENCES Suppliers(SupplierID),	
+);
+CREATE TABLE WarehouseSupplierLink(
+WarehouseID			  INT						REFERENCES Warehouse(WarehouseID),
+SupplierID			  INT						REFERENCES Suppliers(SupplierID),	
+);
+;*/
+
+USE MyAmazonCompetitor
+
+INSERT INTO WarehouseToProductsStored(WarehouseID,ProductsStoredID) VALUES
+(1,1),
+(1,2),
+(1,10),
+(1,8),
+(2,9),
+(2,7),
+(1,5),
+(3,5),
+(7,3),
+(7,1),
+(3,6),
+(10,3),
+(10,10),
+(9,4),
+(8,7);
+
+SELECT * From WarehouseToProductsStored;
+
+
+USE MyAmazonCompetitor
+INSERT INTO ProductsToSupplierLink(ProductID,SupplierID) VALUES
+(10001,1),
+(10004,2),
+(10002,10),
+(10001,8),
+(10002,9),
+(10002,7),
+(10001,5),
+(10003,5),
+(10007,3),
+(10007,1),
+(10003,6),
+(10010,3),
+(10010,10),
+(10009,4),
+(10008,7);
+SELECT * From ProductsToSupplierLink;
+
+USE MyAmazonCompetitor
+
+INSERT INTO WarehouseSupplierLink(WarehouseID,SupplierID) VALUES
+(1,1),
+(1,2),
+(1,10),
+(1,8),
+(2,9),
+(2,7),
+(1,5),
+(3,5),
+(7,3),
+(7,1),
+(3,6),
+(10,3),
+(10,10),
+(9,4),
+(8,7);
+
+SELECT * From WarehouseSupplierLink;
+
+use MyAmazonCompetitor
+
+SET IDENTITY_INSERT Warehouse ON;
+INSERT INTO Warehouse(WarehouseID,StreetAddress,ZIP) VALUES
+(1,'123 gthen Street','25701'),
+(2,'136 cott Street','40206'),
+(3,'765 Tham Street','99611'),
+(4,'677 Endstreet ave','97702'),
+(5,'664 EndRoad ave','97321'),
+(6,'7675 Mountain Clark ave', '83638'),
+(7,'734 Park ave', '59759'),
+(8,'1 Teal ave', '59801'),
+(9,'664 Souththend ave','97702'),
+(10,'7675 Riverside ave', '99611')
+SET IDENTITY_INSERT Warehouse OFF;
+
+SELECT * FROM Warehouse;
