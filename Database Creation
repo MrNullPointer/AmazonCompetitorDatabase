@@ -1,0 +1,153 @@
+use master
+GO
+
+/****Object: Database MyAmazonCompetitor****/
+IF DB_ID('MyAmazonCompetitor') IS NOT NULL
+	DROP DATABASE MyAmazonCompetitor
+GO
+
+Create DATABASE MyAmazonCompetitor
+Go
+
+USE MyAmazonCompetitor
+Go
+
+/****Object: Zip Details Table ****/
+CREATE TABLE ZIPDetails(
+ZIP						INT							PRIMARY KEY			IDENTITY NOT NULL,
+City					VARCHAR(60)		NOT NULL,
+State					VARCHAR(2)		NOT NULL
+);
+
+/******Object: Products table*********/
+CREATE TABLE Products(
+ProductID				INT							PRIMARY KEY			IDENTITY NOT NULL,
+ProductName				VARCHAR(255)	NOT NULL,
+Description				VARCHAR(255)	NOT NULL,
+Price					MONEY			NOT NULL,
+);
+
+/*****Object: Suppliers table******/
+CREATE TABLE Suppliers(
+SupplierID			   INT						 PRIMARY KEY		  IDENTITY	NOT NULL,
+SupplierName		   VARCHAR(60)		NOT NULL,
+StreetName			   VARCHAR(255)		NOT NULL,
+ZIP					   INT						 REFERENCES ZIPDetails(ZIP),
+SupplierPhone		   VARCHAR(20)				NOT NULL,
+SupplierEmailID		   VARCHAR(255)		NOT NULL,
+NumberOfProducts	   INT				NOT NULL,
+);
+
+/******Object: Products Stored table ******/
+CREATE TABLE ProductsStored(
+ProductsStoredID	   INT						 PRIMARY KEY		  IDENTITY	NOT NULL,	
+ProductID	           INT						 REFERENCES Products(ProductID),
+NumberInStock		   INT				NOT NULL,
+NumberOnWay			   INT					DEFAULT NULL,
+NumberOnReturn		   INT					DEFAULT NULL,
+);
+
+/*******Object: Warehouse table *******/
+CREATE TABLE Warehouse(
+WarehouseID			  INT						 PRIMARY KEY		  IDENTITY	NOT NULL,
+StreetAddress		  VARCHAR(255)		NOT NULL,
+ZIP					  INT						 REFERENCES ZIPdetails(ZIP),
+);
+
+/********Object: Warehouse to products stored table ******/
+CREATE TABLE WarehouseToProductsStored(
+WarehouseID			  INT						REFERENCES Warehouse(WarehouseID),
+ProductsStoredID	  INT						REFERENCES ProductsStored(ProductsStoredID)
+);
+
+/*****Object: Products to Suppliers table ******/
+CREATE TABLE ProductsToSupplierLink(
+ProductID			  INT						 REFERENCES Products(ProductID),
+SupplierID			  INT						 REFERENCES Suppliers(SupplierID),	
+);
+
+/****Object: Warehouse to Supplier link ********/
+CREATE TABLE WarehouseSupplierLink(
+WarehouseID			  INT						REFERENCES Warehouse(WarehouseID),
+SupplierID			  INT						REFERENCES Suppliers(SupplierID),	
+);
+
+/****Object: Review table ********/
+CREATE TABLE Review(
+ReviewID			 INT					 PRIMARY KEY			IDENTITY NOT NULL,
+ProductID			 INT						REFERENCES Products(ProductID),
+DateOfReview		 DATETIME		NOT NULL,
+Comments			 VARCHAR(255)			DEFAULT NULL,
+Score				 INT					DEFAULT NULL,
+CustomerName		 VARCHAR(255)			DEFAULT NULL,
+);
+
+
+
+/****Object: Wishlist Table ****/
+CREATE TABLE WishList(
+WishListID				INT							PRIMARY KEY			IDENTITY	NOT NULL,
+Date					DATETIME					DEFAULT NULL,
+ProductID				INT					   REFERENCES PRODUCTS(ProductID),
+Quantity				INT				NOT NULL
+);
+
+
+
+/****Object: Customers Table ****/
+CREATE TABLE Customers(
+CustomerID				INT							PRIMARY KEY			IDENTITY NOT NULL,
+CustomerName			VARCHAR(60)		NOT NULL,
+username				VARCHAR(60)		NOT NULL	UNIQUE,
+CustomerEmail			VARCHAR(255)	NOT NULL	UNIQUE,
+CustomerPhone			VARCHAR(20)				NOT NULL,
+ZIP						INT							REFERENCES ZIPDetails(ZIP),
+ReturnID				INT				NOT NULL,									/*ADD REFERENCE*/
+WishListID				INT						    REFERENCES WishList(WishListID),
+ReviewID				INT							REFERENCES Review(ReviewID)
+);
+
+
+/********Object: OrderItems table**********/
+CREATE TABLE OrderItems(
+OrderItemsID		   INT							PRIMARY KEY			IDENTITY NOT NULL,
+ProductID			   INT							REFERENCES Products(ProductID),
+Quantity			   INT			 NOT NULL,
+UnitPrice			   MONEY		 NOT NULL,
+CumlativeCost	       MONEY		 NOT NULL
+);
+
+/*******Object: Return Items table******/
+CREATE TABLE ReturnItems(
+ReturnItemsID		  INT							PRIMARY KEY		  IDENTITY NOT NULL,
+ProductID			  INT							REFERENCES Products(ProductID),
+Quantity			  INT					DEFAULT NULL
+);
+
+/*******Object: Return details***********/
+CREATE TABLE ReturnDetails(
+ReturnID			   INT							PRIMARY KEY			IDENTITY NOT NULL,
+ReturnItemsID		   INT							REFERENCES ReturnItems(ReturnItemsID),
+DateOfReturn		   DATETIME				DEFAULT NULL,
+StatusOfReturn		   VARCHAR(255)			DEFAULT NULL,
+ShippingInfo		   VARCHAR(255)			DEFAULT NULL,
+ShippingCost		   Money				DEFAULT NULL
+);
+
+/****Object: OrdersTable ****/
+CREATE TABLE OrdersTable(
+OrderID				    INT							 PRIMARY KEY       IDENTITY    NOT NULL,
+CustomerId				INT							 REFERENCES Customers(CustomerID),								
+Status					VARCHAR(255)    NOT NULL,
+ReturnID				INT							 REFERENCES ReturnDetails(ReturnID),
+OrderDate				DATETIME		NOT NULL,
+OrderItemsID			INT							 REFERENCES OrderItems(OrderItemsID),
+TotalPrice				MONEY			NOT NULL,
+ShippingService			VARCHAR(255)					DEFAULT NULL,
+StreetAddress			VARCHAR(255)	NOT NULL,
+ZIP						INT								REFERENCES ZIPDetails(ZIP),								
+ShippingFare			MONEY			NOT NULL,
+ExpectedShippingDate	DATETIME		NOT NULL,
+ActualShippingDate		DATETIME						DEFAULT NULL,
+ShippingInfo			VARCHAR(255)					DEFAULT NULL
+);
